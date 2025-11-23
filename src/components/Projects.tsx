@@ -57,22 +57,39 @@ export default function Projects() {
             {projects.map((project, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 30, rotateY: 0 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 onHoverStart={() => setHoveredIndex(index)}
                 onHoverEnd={() => setHoveredIndex(null)}
+                whileHover={{ 
+                  scale: 1.05, 
+                  rotateX: 5, 
+                  rotateY: 5,
+                  transition: { duration: 0.3 }
+                }}
+                style={{
+                  transformStyle: "preserve-3d",
+                }}
               >
                 <Card
-                  className={`p-6 h-full bg-card/50 backdrop-blur-sm border-${project.color}/20 hover:border-${project.color} transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,217,255,0.3)] relative overflow-hidden group`}
-                  style={{
-                    transform: hoveredIndex === index ? "perspective(1000px) rotateX(2deg) rotateY(2deg)" : "none",
-                  }}
+                  className={`p-6 h-full bg-card/50 backdrop-blur-sm border-${project.color}/20 hover:border-${project.color} transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,217,255,0.5)] relative overflow-hidden group`}
                 >
                   {project.award && (
-                    <div className="absolute top-4 right-4">
-                      <Award className="h-6 w-6 text-accent" />
-                    </div>
+                    <motion.div 
+                      className="absolute top-4 right-4"
+                      animate={{
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <Award className="h-6 w-6 text-accent drop-shadow-[0_0_8px_rgba(0,217,255,0.8)]" />
+                    </motion.div>
                   )}
 
                   <h3 className={`text-2xl font-bold text-${project.color} mb-2`}>
@@ -84,12 +101,14 @@ export default function Projects() {
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {project.technologies.map((tech) => (
-                        <span
+                        <motion.span
                           key={tech}
                           className="px-2 py-1 text-xs rounded-full bg-muted/50 text-foreground border border-primary/30"
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.2 }}
                         >
                           {tech}
-                        </span>
+                        </motion.span>
                       ))}
                     </div>
 
@@ -98,7 +117,7 @@ export default function Projects() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className={`flex-1 border-${project.color} text-${project.color} hover:bg-${project.color} hover:text-${project.color}-foreground`}
+                          className={`flex-1 border-${project.color} text-${project.color} hover:bg-${project.color} hover:text-${project.color}-foreground transition-all duration-300`}
                           asChild
                         >
                           <a href={project.github} target="_blank" rel="noopener noreferrer">
@@ -109,7 +128,7 @@ export default function Projects() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className={`flex-1 border-${project.color} text-${project.color} hover:bg-${project.color} hover:text-${project.color}-foreground`}
+                          className={`flex-1 border-${project.color} text-${project.color} hover:bg-${project.color} hover:text-${project.color}-foreground transition-all duration-300`}
                           asChild
                         >
                           <a href={project.github} target="_blank" rel="noopener noreferrer">
@@ -122,7 +141,22 @@ export default function Projects() {
                   </div>
 
                   {/* Animated gradient background on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 opacity-0 group-hover:opacity-100 -z-10"
+                    animate={hoveredIndex === index ? {
+                      background: [
+                        "linear-gradient(135deg, rgba(0,217,255,0.1) 0%, rgba(224,36,143,0.1) 100%)",
+                        "linear-gradient(225deg, rgba(224,36,143,0.1) 0%, rgba(159,67,255,0.1) 100%)",
+                        "linear-gradient(315deg, rgba(159,67,255,0.1) 0%, rgba(0,217,255,0.1) 100%)",
+                        "linear-gradient(135deg, rgba(0,217,255,0.1) 0%, rgba(224,36,143,0.1) 100%)",
+                      ]
+                    } : {}}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
                 </Card>
               </motion.div>
             ))}
