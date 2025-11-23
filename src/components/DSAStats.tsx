@@ -1,8 +1,26 @@
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Code2, TrendingUp, Target, Zap } from "lucide-react";
+
+function AnimatedCounter({ value, isInView, delay, suffix = "" }: { value: number, isInView: boolean, delay: number, suffix?: string }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v) + suffix);
+  
+  useEffect(() => {
+    if (isInView) {
+      const controls = animate(count, value, {
+        duration: 2,
+        delay: delay,
+        ease: "easeOut",
+      });
+      return controls.stop;
+    }
+  }, [isInView, value, delay, count]);
+
+  return <motion.span>{rounded}</motion.span>;
+}
 
 const stats = [
   {
@@ -80,7 +98,7 @@ export default function DSAStats() {
                           <div className="flex items-center justify-between p-3 bg-muted/10 rounded-lg">
                             <span className="text-foreground/80">Rating</span>
                             <span className={`text-2xl font-bold text-${stat.color}`}>
-                              {stat.rating}
+                              <AnimatedCounter value={parseInt(stat.rating)} isInView={isInView} delay={0.5 + index * 0.2} />
                             </span>
                           </div>
                         )}
@@ -89,7 +107,7 @@ export default function DSAStats() {
                           <div className="flex items-center justify-between p-3 bg-muted/10 rounded-lg">
                             <span className="text-foreground/80">Coding Score</span>
                             <span className={`text-2xl font-bold text-${stat.color}`}>
-                              {stat.codingScore}
+                              <AnimatedCounter value={parseInt(stat.codingScore)} isInView={isInView} delay={0.6 + index * 0.2} />
                             </span>
                           </div>
                         )}
@@ -116,20 +134,28 @@ export default function DSAStats() {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
           >
-            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-primary/20">
-              <p className="text-3xl font-bold text-primary mb-1">700+</p>
+            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,217,255,0.3)]">
+              <p className="text-3xl font-bold text-primary mb-1">
+                <AnimatedCounter value={700} isInView={isInView} delay={0.8} suffix="+" />
+              </p>
               <p className="text-sm text-muted-foreground">Total Problems</p>
             </Card>
-            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-secondary/20">
-              <p className="text-3xl font-bold text-secondary mb-1">1479</p>
+            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-secondary/20 hover:border-secondary transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,217,255,0.3)]">
+              <p className="text-3xl font-bold text-secondary mb-1">
+                <AnimatedCounter value={1479} isInView={isInView} delay={0.9} />
+              </p>
               <p className="text-sm text-muted-foreground">Peak Rating</p>
             </Card>
-            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-accent/20">
-              <p className="text-3xl font-bold text-accent mb-1">165</p>
+            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-accent/20 hover:border-accent transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,217,255,0.3)]">
+              <p className="text-3xl font-bold text-accent mb-1">
+                <AnimatedCounter value={165} isInView={isInView} delay={1.0} />
+              </p>
               <p className="text-sm text-muted-foreground">Best Contest Rank</p>
             </Card>
-            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-primary/20">
-              <p className="text-3xl font-bold text-primary mb-1">419</p>
+            <Card className="p-4 text-center bg-card/30 backdrop-blur-sm border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,217,255,0.3)]">
+              <p className="text-3xl font-bold text-primary mb-1">
+                <AnimatedCounter value={419} isInView={isInView} delay={1.1} />
+              </p>
               <p className="text-sm text-muted-foreground">CodeKaze AIR</p>
             </Card>
           </motion.div>

@@ -48,9 +48,9 @@ export default function Experience() {
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-accent to-primary mx-auto mb-12" />
 
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent hidden md:block" />
+            <div className="relative">
+            {/* Timeline line with glow effect */}
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent hidden md:block shadow-[0_0_15px_rgba(0,217,255,0.6)] animate-pulse-slow" />
 
             <div className="space-y-8">
               {experiences.map((exp, index) => (
@@ -61,8 +61,23 @@ export default function Experience() {
                   transition={{ duration: 0.6, delay: index * 0.2 }}
                   className="relative"
                 >
-                  {/* Timeline dot */}
-                  <div className={`absolute left-6 w-5 h-5 rounded-full bg-${exp.color} border-4 border-background hidden md:block shadow-[0_0_10px_rgba(0,217,255,0.5)]`} />
+                  {/* Timeline dot with pulse animation */}
+                  <motion.div 
+                    className={`absolute left-6 w-5 h-5 rounded-full bg-${exp.color} border-4 border-background hidden md:block shadow-[0_0_20px_rgba(0,217,255,0.8)]`}
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      boxShadow: [
+                        "0 0 20px rgba(0,217,255,0.8)",
+                        "0 0 30px rgba(0,217,255,1)",
+                        "0 0 20px rgba(0,217,255,0.8)"
+                      ]
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity,
+                      delay: index * 0.3 
+                    }}
+                  />
 
                   <Card className="ml-0 md:ml-20 p-6 bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,217,255,0.2)]">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">

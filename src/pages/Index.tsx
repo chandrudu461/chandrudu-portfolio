@@ -6,6 +6,8 @@ import Experience from "@/components/Experience";
 import Projects from "@/components/Projects";
 import Achievements from "@/components/Achievements";
 import DSAStats from "@/components/DSAStats";
+import PortfolioImportance from "@/components/PortfolioImportance";
+import PortfolioGuide from "@/components/PortfolioGuide";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
@@ -21,6 +23,8 @@ export default function Index() {
         <Projects />
         <Achievements />
         <DSAStats />
+        <PortfolioImportance />
+        <PortfolioGuide />
         <Contact />
       </main>
       <Footer />

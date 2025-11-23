@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Github, Linkedin, Code } from "lucide-react";
 import { useState } from "react";
 import avatar from "@/assets/avatar.jpg";
+import avatarAnime from "@/assets/avatar-anime.jpg";
 
 const AnimatedSphere = () => {
   return (
@@ -21,7 +22,7 @@ const AnimatedSphere = () => {
 };
 
 export default function Hero() {
-  const [useAiAvatar, setUseAiAvatar] = useState(true);
+  const [useAnimeAvatar, setUseAnimeAvatar] = useState(false);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -55,10 +56,14 @@ export default function Hero() {
                 className="relative"
               >
                 <div className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-primary shadow-[0_0_50px_rgba(0,217,255,0.5)] group-hover:shadow-[0_0_80px_rgba(0,217,255,0.8)] transition-all duration-300">
-                  <img
-                    src={avatar}
+                  <motion.img
+                    key={useAnimeAvatar ? "anime" : "real"}
+                    src={useAnimeAvatar ? avatarAnime : avatar}
                     alt="Chandrudu Bugude"
                     className="w-full h-full object-cover"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
                   />
                 </div>
                 {/* Animated rings */}
@@ -69,10 +74,10 @@ export default function Hero() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setUseAiAvatar(!useAiAvatar)}
-                className="absolute bottom-4 right-4 bg-card/80 backdrop-blur-sm hover:bg-card border-primary"
+                onClick={() => setUseAnimeAvatar(!useAnimeAvatar)}
+                className="absolute bottom-4 right-4 bg-card/80 backdrop-blur-sm hover:bg-card border-primary hover:shadow-[0_0_20px_rgba(0,217,255,0.5)] transition-all duration-300"
               >
-                {useAiAvatar ? "AI Avatar" : "Real Photo"}
+                {useAnimeAvatar ? "🎨 Anime" : "📷 Real"}
               </Button>
             </div>
           </motion.div>

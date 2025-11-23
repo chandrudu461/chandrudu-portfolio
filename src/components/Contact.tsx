@@ -20,7 +20,6 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd send this to a backend
     toast({
       title: "Message Sent!",
       description: "Thank you for reaching out. I'll get back to you soon!",
@@ -115,11 +114,22 @@ export default function Contact() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={isInView ? { opacity: 1, x: 0 } : {}}
                       transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                      whileHover={{ x: 5 }}
+                      whileHover={{ x: 8, scale: 1.02 }}
                     >
-                      <Card className={`p-4 bg-card/50 backdrop-blur-sm border-${info.color}/20 hover:border-${info.color} transition-all duration-300`}>
+                      <Card className={`p-4 bg-card/50 backdrop-blur-sm border-${info.color}/20 hover:border-${info.color} transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,217,255,0.4)]`}>
                         <div className="flex items-center gap-4">
-                          <Icon className={`h-6 w-6 text-${info.color}`} />
+                          <motion.div
+                            animate={{
+                              y: [0, -5, 0],
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            }}
+                          >
+                            <Icon className={`h-6 w-6 text-${info.color} drop-shadow-[0_0_8px_rgba(0,217,255,0.6)]`} />
+                          </motion.div>
                           <div>
                             <p className="text-sm text-muted-foreground">{info.label}</p>
                             {info.href ? (
@@ -155,8 +165,8 @@ export default function Contact() {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isInView ? { opacity: 1, scale: 1 } : {}}
                         transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-                        whileHover={{ scale: 1.2, y: -5 }}
-                        className={`p-3 rounded-full bg-card border border-${social.color}/30 hover:border-${social.color} hover:shadow-[0_0_20px_rgba(0,217,255,0.3)] transition-all duration-300`}
+                        whileHover={{ scale: 1.3, y: -8, rotate: 5 }}
+                        className={`p-3 rounded-full bg-card border border-${social.color}/30 hover:border-${social.color} hover:shadow-[0_0_25px_rgba(0,217,255,0.5)] transition-all duration-300`}
                       >
                         <Icon className={`h-6 w-6 text-${social.color}`} />
                       </motion.a>
@@ -172,9 +182,11 @@ export default function Contact() {
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20">
+              <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20 hover:shadow-[0_0_30px_rgba(0,217,255,0.2)] transition-all duration-300">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
+                  <motion.div
+                    whileFocus={{ scale: 1.02 }}
+                  >
                     <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                       Your Name
                     </label>
@@ -185,11 +197,13 @@ export default function Contact() {
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="John Doe"
                       required
-                      className="bg-background/50 border-border focus:border-primary"
+                      className="bg-background/50 border-border focus:border-primary focus:shadow-[0_0_15px_rgba(0,217,255,0.3)] transition-all duration-300"
                     />
-                  </div>
+                  </motion.div>
 
-                  <div>
+                  <motion.div
+                    whileFocus={{ scale: 1.02 }}
+                  >
                     <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                       Email Address
                     </label>
@@ -200,11 +214,13 @@ export default function Contact() {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="john@example.com"
                       required
-                      className="bg-background/50 border-border focus:border-primary"
+                      className="bg-background/50 border-border focus:border-primary focus:shadow-[0_0_15px_rgba(0,217,255,0.3)] transition-all duration-300"
                     />
-                  </div>
+                  </motion.div>
 
-                  <div>
+                  <motion.div
+                    whileFocus={{ scale: 1.02 }}
+                  >
                     <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
                       Message
                     </label>
@@ -215,18 +231,35 @@ export default function Contact() {
                       placeholder="Your message here..."
                       required
                       rows={6}
-                      className="bg-background/50 border-border focus:border-primary resize-none"
+                      className="bg-background/50 border-border focus:border-primary focus:shadow-[0_0_15px_rgba(0,217,255,0.3)] resize-none transition-all duration-300"
                     />
-                  </div>
+                  </motion.div>
 
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(0,217,255,0.5)] hover:shadow-[0_0_30px_rgba(0,217,255,0.8)] transition-all duration-300"
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <Send className="mr-2 h-5 w-5" />
-                    Send Message
-                  </Button>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(0,217,255,0.5)] hover:shadow-[0_0_35px_rgba(0,217,255,0.8)] transition-all duration-300 group"
+                    >
+                      <motion.div
+                        className="flex items-center justify-center w-full"
+                        animate={{
+                          x: [0, 5, 0],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        <Send className="mr-2 h-5 w-5 group-hover:rotate-45 transition-transform duration-300" />
+                        Send Message
+                      </motion.div>
+                    </Button>
+                  </motion.div>
                 </form>
               </Card>
             </motion.div>
