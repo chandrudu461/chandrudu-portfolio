@@ -1,109 +1,180 @@
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Text, PerspectiveCamera } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Text, PerspectiveCamera, MeshDistortMaterial, Sphere } from "@react-three/drei";
 import { motion } from "framer-motion";
 import { useRef, useState, Suspense, useEffect } from "react";
 import * as THREE from "three";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Skill {
   name: string;
-  level: number;
-  description: string;
-  experience: string;
-  position: [number, number, number];
+  proficiency: string;
+  angle: number;
+  radius: number;
+  height: number;
   color: string;
 }
 
 const skills: Skill[] = [
-  { name: "C/C++", level: 90, description: "System programming and performance optimization", experience: "3+ years", position: [2, 1, 0], color: "#00d9ff" },
-  { name: "Java", level: 85, description: "Enterprise applications and Android development", experience: "3+ years", position: [-2, 0.5, 1], color: "#ff00ff" },
-  { name: "Python", level: 88, description: "Machine learning and automation scripts", experience: "2+ years", position: [1, -1, 2], color: "#8b5cf6" },
-  { name: "DSA", level: 92, description: "Advanced algorithms and problem solving", experience: "4+ years", position: [-1, 2, -1], color: "#00d9ff" },
-  { name: "React.js", level: 85, description: "Modern web applications and SPAs", experience: "2+ years", position: [3, -0.5, -1], color: "#ff00ff" },
-  { name: "JavaScript", level: 87, description: "Full-stack web development", experience: "3+ years", position: [-3, -1, 0], color: "#8b5cf6" },
-  { name: "SQL", level: 83, description: "Database design and optimization", experience: "2+ years", position: [0, 1.5, 2], color: "#00d9ff" },
-  { name: "Android", level: 80, description: "Native Android app development", experience: "2+ years", position: [-2, -2, -2], color: "#ff00ff" },
-  { name: "HTML/CSS", level: 90, description: "Responsive UI design", experience: "4+ years", position: [2, 2, 1], color: "#8b5cf6" },
+  { name: "C", proficiency: "Advanced", angle: 0, radius: 3, height: 0.5, color: "#00d9ff" },
+  { name: "C++", proficiency: "Advanced", angle: 30, radius: 3.2, height: -0.3, color: "#ff00ff" },
+  { name: "Java", proficiency: "Proficient", angle: 60, radius: 3.5, height: 0.8, color: "#8b5cf6" },
+  { name: "Python", proficiency: "Experienced", angle: 90, radius: 3.3, height: -0.5, color: "#00d9ff" },
+  { name: "SQL", proficiency: "Proficient", angle: 120, radius: 3.6, height: 0.2, color: "#ff00ff" },
+  { name: "Android", proficiency: "Experienced", angle: 150, radius: 3.4, height: -0.7, color: "#8b5cf6" },
+  { name: "DSA", proficiency: "Advanced", angle: 180, radius: 3.7, height: 0.6, color: "#00d9ff" },
+  { name: "HTML", proficiency: "Advanced", angle: 210, radius: 3.2, height: -0.4, color: "#ff00ff" },
+  { name: "CSS", proficiency: "Advanced", angle: 240, radius: 3.5, height: 0.4, color: "#8b5cf6" },
+  { name: "JavaScript", proficiency: "Experienced", angle: 270, radius: 3.3, height: -0.6, color: "#00d9ff" },
+  { name: "React.js", proficiency: "Proficient", angle: 300, radius: 3.6, height: 0.7, color: "#ff00ff" },
 ];
 
-function SkillTag({ skill, onClick }: { skill: Skill; onClick: () => void }) {
+function TechCore() {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x = state.clock.getElapsedTime() * 0.2;
+      meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.3;
+    }
+  });
+
+  return (
+    <Sphere ref={meshRef} args={[1, 64, 64]}>
+      <MeshDistortMaterial
+        color="#00d9ff"
+        attach="material"
+        distort={0.3}
+        speed={2}
+        roughness={0.2}
+        metalness={0.8}
+        emissive="#00d9ff"
+        emissiveIntensity={0.8}
+      />
+    </Sphere>
+  );
+}
+
+function SkillTile({ skill, mousePosition }: { skill: Skill; mousePosition: { x: number; y: number } }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      const time = state.clock.getElapsedTime() * 0.3;
+      const angleOffset = (skill.angle * Math.PI) / 180;
+      
+      const x = Math.cos(time + angleOffset) * skill.radius;
+      const z = Math.sin(time + angleOffset) * skill.radius;
+      const y = skill.height + Math.sin(time * 2) * 0.2;
+
+      meshRef.current.position.x = x + mousePosition.x * 0.5;
+      meshRef.current.position.y = y + mousePosition.y * 0.3;
+      meshRef.current.position.z = z;
+
+      meshRef.current.lookAt(0, 0, 0);
+      
+      meshRef.current.rotation.z = 0;
+    }
+  });
 
   useEffect(() => {
     document.body.style.cursor = hovered ? "pointer" : "auto";
   }, [hovered]);
 
   return (
-    <group position={skill.position}>
+    <group>
       <mesh
         ref={meshRef}
-        onClick={onClick}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         scale={hovered ? 1.3 : 1}
       >
-        <sphereGeometry args={[0.15, 16, 16]} />
+        <boxGeometry args={[0.8, 0.5, 0.1]} />
         <meshStandardMaterial
           color={skill.color}
           emissive={skill.color}
-          emissiveIntensity={hovered ? 1.5 : 0.5}
+          emissiveIntensity={hovered ? 1.2 : 0.5}
           transparent
-          opacity={0.8}
+          opacity={0.9}
+          metalness={0.8}
+          roughness={0.2}
         />
       </mesh>
-      <Text
-        position={[0, 0, 0]}
-        fontSize={0.25}
-        color={hovered ? "#ffffff" : "#e0e0e0"}
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.02}
-        outlineColor="#000000"
-      >
-        {skill.name}
-      </Text>
-      {hovered && (
-        <mesh position={[0, -0.4, 0]}>
-          <planeGeometry args={[2, 0.3]} />
-          <meshBasicMaterial color="#000000" transparent opacity={0.7} />
-        </mesh>
-      )}
-      {hovered && (
-        <Text
-          position={[0, -0.4, 0.01]}
-          fontSize={0.12}
-          color="#ffffff"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={1.8}
-        >
-          {skill.description}
-        </Text>
+      
+      {meshRef.current && (
+        <>
+          <Text
+            position={[
+              meshRef.current.position.x,
+              meshRef.current.position.y,
+              meshRef.current.position.z + 0.06
+            ]}
+            fontSize={0.22}
+            color="#ffffff"
+            anchorX="center"
+            anchorY="middle"
+            font="/fonts/inter.woff"
+            outlineWidth={0.01}
+            outlineColor="#000000"
+          >
+            {skill.name}
+          </Text>
+          
+          {hovered && (
+            <Text
+              position={[
+                meshRef.current.position.x,
+                meshRef.current.position.y - 0.35,
+                meshRef.current.position.z + 0.06
+              ]}
+              fontSize={0.12}
+              color="#ffffff"
+              anchorX="center"
+              anchorY="middle"
+              outlineWidth={0.005}
+              outlineColor="#000000"
+            >
+              {skill.proficiency}
+            </Text>
+          )}
+        </>
       )}
     </group>
   );
 }
 
-function Particles() {
+function ParticleField() {
   const particlesRef = useRef<THREE.Points>(null);
-  const particleCount = 500;
+  const particleCount = 800;
   const positions = new Float32Array(particleCount * 3);
+  const colors = new Float32Array(particleCount * 3);
 
-  for (let i = 0; i < particleCount * 3; i++) {
-    positions[i] = (Math.random() - 0.5) * 20;
+  for (let i = 0; i < particleCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 30;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 30;
+
+    const colorChoice = Math.random();
+    if (colorChoice < 0.33) {
+      colors[i * 3] = 0;
+      colors[i * 3 + 1] = 0.85;
+      colors[i * 3 + 2] = 1;
+    } else if (colorChoice < 0.66) {
+      colors[i * 3] = 1;
+      colors[i * 3 + 1] = 0;
+      colors[i * 3 + 2] = 1;
+    } else {
+      colors[i * 3] = 0.55;
+      colors[i * 3 + 1] = 0.36;
+      colors[i * 3 + 2] = 0.96;
+    }
   }
 
-  useEffect(() => {
-    const animate = () => {
-      if (particlesRef.current) {
-        particlesRef.current.rotation.y += 0.0002;
-        particlesRef.current.rotation.x += 0.0001;
-      }
-    };
-    const interval = setInterval(animate, 16);
-    return () => clearInterval(interval);
-  }, []);
+  useFrame(() => {
+    if (particlesRef.current) {
+      particlesRef.current.rotation.y += 0.0002;
+      particlesRef.current.rotation.x += 0.0001;
+    }
+  });
 
   return (
     <points ref={particlesRef}>
@@ -114,55 +185,61 @@ function Particles() {
           array={positions}
           itemSize={3}
         />
+        <bufferAttribute
+          attach="attributes-color"
+          count={particleCount}
+          array={colors}
+          itemSize={3}
+        />
       </bufferGeometry>
-      <pointsMaterial size={0.02} color="#00d9ff" transparent opacity={0.3} />
+      <pointsMaterial
+        size={0.05}
+        vertexColors
+        transparent
+        opacity={0.4}
+        sizeAttenuation
+        blending={THREE.AdditiveBlending}
+      />
     </points>
   );
 }
 
-function Scene({ onSkillClick }: { onSkillClick: (skill: Skill) => void }) {
-  const groupRef = useRef<THREE.Group>(null);
+function Scene() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const animate = () => {
-      if (groupRef.current) {
-        groupRef.current.rotation.y += 0.001;
-      }
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -(event.clientY / window.innerHeight) * 2 + 1,
+      });
     };
-    const interval = setInterval(animate, 16);
-    return () => clearInterval(interval);
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0, 8]} />
-      <OrbitControls
-        enableZoom={false}
-        enablePan={false}
-        maxPolarAngle={Math.PI / 1.5}
-        minPolarAngle={Math.PI / 3}
-        autoRotate
-        autoRotateSpeed={0.5}
-      />
-      <ambientLight intensity={0.3} />
-      <pointLight position={[10, 10, 10]} intensity={1} color="#00d9ff" />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff00ff" />
-      <pointLight position={[0, 0, 10]} intensity={0.5} color="#8b5cf6" />
+      <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
+      
+      <ambientLight intensity={0.2} />
+      <pointLight position={[0, 0, 0]} intensity={2} color="#00d9ff" distance={15} />
+      <pointLight position={[5, 5, 5]} intensity={1} color="#ff00ff" />
+      <pointLight position={[-5, -5, -5]} intensity={1} color="#8b5cf6" />
       
       <Suspense fallback={null}>
-        <Particles />
-        <group ref={groupRef}>
-          {skills.map((skill) => (
-            <SkillTag key={skill.name} skill={skill} onClick={() => onSkillClick(skill)} />
-          ))}
-        </group>
+        <ParticleField />
+        <TechCore />
+        {skills.map((skill) => (
+          <SkillTile key={skill.name} skill={skill} mousePosition={mousePosition} />
+        ))}
       </Suspense>
     </>
   );
 }
 
 export default function Skills() {
-  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -173,51 +250,72 @@ export default function Skills() {
   }, []);
 
   return (
-    <section id="skills" className="py-20 px-4 bg-card/20 overflow-hidden">
-      <div className="container mx-auto max-w-6xl">
+    <section id="skills" className="py-20 px-4 bg-gradient-to-b from-card/20 via-background to-card/20 overflow-hidden relative">
+      {/* Subtle background glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      
+      <div className="container mx-auto max-w-6xl relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            <span className="bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-              Skills & Technologies
+          <motion.h2 
+            className="text-4xl md:text-5xl font-bold text-center mb-4 relative"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, delay: 0.2 }}
+          >
+            <span className="bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent relative">
+              Skillverse
+              <motion.span
+                className="absolute inset-0 bg-gradient-to-r from-secondary/30 to-accent/30 blur-xl"
+                animate={{
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
             </span>
-          </h2>
+          </motion.h2>
           <div className="w-20 h-1 bg-gradient-to-r from-secondary to-accent mx-auto mb-6" />
           
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.3 }}
-            className="text-center text-muted-foreground mb-12 text-lg"
+            transition={{ duration: 1, delay: 0.4 }}
+            className="text-center text-muted-foreground mb-12 text-base md:text-lg px-4 max-w-3xl mx-auto"
           >
-            Here are the technologies I use to bring ideas to life — presented in an immersive 3D experience.
+            Explore My Skillverse — A Universe of Technologies I Use to Build, Solve & Innovate.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1.2, delay: 0.5 }}
-            className="w-full h-[600px] rounded-xl overflow-hidden bg-gradient-to-br from-card/50 to-card/20 backdrop-blur-sm border border-primary/20 shadow-[0_0_50px_rgba(0,217,255,0.15)]"
+            transition={{ duration: 1.2, delay: 0.6 }}
+            className="w-full h-[600px] md:h-[700px] rounded-2xl overflow-hidden relative"
             style={{
-              boxShadow: "0 0 50px rgba(0, 217, 255, 0.15), 0 0 100px rgba(255, 0, 255, 0.1)",
+              background: "radial-gradient(ellipse at center, rgba(0, 217, 255, 0.05) 0%, transparent 70%)",
             }}
           >
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/10 to-card/30 pointer-events-none z-10" />
             <Canvas
               dpr={isMobile ? [1, 1.5] : [1, 2]}
               performance={{ min: 0.5 }}
-              gl={{ 
+              gl={{
                 antialias: !isMobile,
                 alpha: true,
-                powerPreference: "high-performance"
+                powerPreference: "high-performance",
               }}
             >
-              <Scene onSkillClick={setSelectedSkill} />
+              <Scene />
             </Canvas>
           </motion.div>
 
@@ -225,50 +323,24 @@ export default function Skills() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 1 }}
-            className="mt-8 text-center text-sm text-muted-foreground"
+            transition={{ duration: 0.8, delay: 1 }}
+            className="mt-8 text-center"
           >
-            <p>💡 Click on any skill to learn more • Drag to rotate • Hover for details</p>
+            <p className="text-xs md:text-sm text-muted-foreground/70 italic">
+              💡 Hover over tiles to reveal proficiency • Drag to explore
+            </p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 1.3 }}
+              className="mt-4 text-xs md:text-sm bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent font-medium"
+            >
+              Powered entirely by AI — 3D visuals, animations, and design.
+            </motion.p>
           </motion.div>
         </motion.div>
       </div>
-
-      <Dialog open={!!selectedSkill} onOpenChange={() => setSelectedSkill(null)}>
-        <DialogContent className="bg-card/95 backdrop-blur-xl border-primary/30 shadow-[0_0_40px_rgba(0,217,255,0.2)]">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-              {selectedSkill?.name}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Description</p>
-              <p className="text-foreground">{selectedSkill?.description}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Experience</p>
-              <p className="text-foreground font-semibold">{selectedSkill?.experience}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Proficiency</p>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-3 bg-muted/30 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${selectedSkill?.level}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="h-full bg-gradient-to-r from-secondary to-accent"
-                    style={{
-                      boxShadow: `0 0 20px ${selectedSkill?.color}`,
-                    }}
-                  />
-                </div>
-                <span className="text-lg font-bold text-accent">{selectedSkill?.level}%</span>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 }
