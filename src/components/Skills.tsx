@@ -1,124 +1,274 @@
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef, useEffect } from "react";
-import { Card } from "@/components/ui/card";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Text, PerspectiveCamera } from "@react-three/drei";
+import { motion } from "framer-motion";
+import { useRef, useState, Suspense, useEffect } from "react";
+import * as THREE from "three";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const skillsWithProficiency = [
-  { name: "C/C++", level: 90, color: "primary" },
-  { name: "Java", level: 85, color: "secondary" },
-  { name: "Python", level: 88, color: "accent" },
-  { name: "Data Structures & Algorithms", level: 92, color: "primary" },
-  { name: "React.js", level: 85, color: "secondary" },
-  { name: "JavaScript", level: 87, color: "accent" },
-  { name: "SQL", level: 83, color: "primary" },
-  { name: "Android Studio", level: 80, color: "secondary" },
+interface Skill {
+  name: string;
+  level: number;
+  description: string;
+  experience: string;
+  position: [number, number, number];
+  color: string;
+}
+
+const skills: Skill[] = [
+  { name: "C/C++", level: 90, description: "System programming and performance optimization", experience: "3+ years", position: [2, 1, 0], color: "#00d9ff" },
+  { name: "Java", level: 85, description: "Enterprise applications and Android development", experience: "3+ years", position: [-2, 0.5, 1], color: "#ff00ff" },
+  { name: "Python", level: 88, description: "Machine learning and automation scripts", experience: "2+ years", position: [1, -1, 2], color: "#8b5cf6" },
+  { name: "DSA", level: 92, description: "Advanced algorithms and problem solving", experience: "4+ years", position: [-1, 2, -1], color: "#00d9ff" },
+  { name: "React.js", level: 85, description: "Modern web applications and SPAs", experience: "2+ years", position: [3, -0.5, -1], color: "#ff00ff" },
+  { name: "JavaScript", level: 87, description: "Full-stack web development", experience: "3+ years", position: [-3, -1, 0], color: "#8b5cf6" },
+  { name: "SQL", level: 83, description: "Database design and optimization", experience: "2+ years", position: [0, 1.5, 2], color: "#00d9ff" },
+  { name: "Android", level: 80, description: "Native Android app development", experience: "2+ years", position: [-2, -2, -2], color: "#ff00ff" },
+  { name: "HTML/CSS", level: 90, description: "Responsive UI design", experience: "4+ years", position: [2, 2, 1], color: "#8b5cf6" },
 ];
 
-function AnimatedProgressBar({ skill, index, isInView }: { skill: typeof skillsWithProficiency[0], index: number, isInView: boolean }) {
-  const progress = useMotionValue(0);
-  const width = useTransform(progress, (v) => `${v}%`);
-  
+function SkillTag({ skill, onClick }: { skill: Skill; onClick: () => void }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
+
   useEffect(() => {
-    if (isInView) {
-      const controls = animate(progress, skill.level, {
-        duration: 1.5,
-        delay: index * 0.1,
-        ease: "easeOut",
-      });
-      return controls.stop;
-    }
-  }, [isInView, skill.level, index, progress]);
+    document.body.style.cursor = hovered ? "pointer" : "auto";
+  }, [hovered]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -30 }}
-      animate={isInView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group"
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-foreground font-medium group-hover:text-primary transition-colors duration-300">
-          {skill.name}
-        </span>
-        <motion.span 
-          className={`text-sm font-bold text-${skill.color}`}
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: index * 0.1 + 1 }}
-        >
-          {skill.level}%
-        </motion.span>
-      </div>
-      <div className="h-3 bg-muted/30 rounded-full overflow-hidden backdrop-blur-sm border border-border/50">
-        <motion.div
-          className={`h-full bg-gradient-to-r from-${skill.color} to-${skill.color}/70 shadow-[0_0_10px_rgba(0,217,255,0.5)] group-hover:shadow-[0_0_20px_rgba(0,217,255,0.8)] transition-shadow duration-300`}
-          style={{ width }}
+    <group position={skill.position}>
+      <mesh
+        ref={meshRef}
+        onClick={onClick}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+        scale={hovered ? 1.3 : 1}
+      >
+        <sphereGeometry args={[0.15, 16, 16]} />
+        <meshStandardMaterial
+          color={skill.color}
+          emissive={skill.color}
+          emissiveIntensity={hovered ? 1.5 : 0.5}
+          transparent
+          opacity={0.8}
         />
-      </div>
-    </motion.div>
+      </mesh>
+      <Text
+        position={[0, 0, 0]}
+        fontSize={0.25}
+        color={hovered ? "#ffffff" : "#e0e0e0"}
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.02}
+        outlineColor="#000000"
+      >
+        {skill.name}
+      </Text>
+      {hovered && (
+        <mesh position={[0, -0.4, 0]}>
+          <planeGeometry args={[2, 0.3]} />
+          <meshBasicMaterial color="#000000" transparent opacity={0.7} />
+        </mesh>
+      )}
+      {hovered && (
+        <Text
+          position={[0, -0.4, 0.01]}
+          fontSize={0.12}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+          maxWidth={1.8}
+        >
+          {skill.description}
+        </Text>
+      )}
+    </group>
+  );
+}
+
+function Particles() {
+  const particlesRef = useRef<THREE.Points>(null);
+  const particleCount = 500;
+  const positions = new Float32Array(particleCount * 3);
+
+  for (let i = 0; i < particleCount * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 20;
+  }
+
+  useEffect(() => {
+    const animate = () => {
+      if (particlesRef.current) {
+        particlesRef.current.rotation.y += 0.0002;
+        particlesRef.current.rotation.x += 0.0001;
+      }
+    };
+    const interval = setInterval(animate, 16);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <points ref={particlesRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={particleCount}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial size={0.02} color="#00d9ff" transparent opacity={0.3} />
+    </points>
+  );
+}
+
+function Scene({ onSkillClick }: { onSkillClick: (skill: Skill) => void }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    const animate = () => {
+      if (groupRef.current) {
+        groupRef.current.rotation.y += 0.001;
+      }
+    };
+    const interval = setInterval(animate, 16);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <>
+      <PerspectiveCamera makeDefault position={[0, 0, 8]} />
+      <OrbitControls
+        enableZoom={false}
+        enablePan={false}
+        maxPolarAngle={Math.PI / 1.5}
+        minPolarAngle={Math.PI / 3}
+        autoRotate
+        autoRotateSpeed={0.5}
+      />
+      <ambientLight intensity={0.3} />
+      <pointLight position={[10, 10, 10]} intensity={1} color="#00d9ff" />
+      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff00ff" />
+      <pointLight position={[0, 0, 10]} intensity={0.5} color="#8b5cf6" />
+      
+      <Suspense fallback={null}>
+        <Particles />
+        <group ref={groupRef}>
+          {skills.map((skill) => (
+            <SkillTag key={skill.name} skill={skill} onClick={() => onSkillClick(skill)} />
+          ))}
+        </group>
+      </Suspense>
+    </>
   );
 }
 
 export default function Skills() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   return (
-    <section id="skills" className="py-20 px-4 bg-card/20">
+    <section id="skills" className="py-20 px-4 bg-card/20 overflow-hidden">
       <div className="container mx-auto max-w-6xl">
         <motion.div
-          ref={ref}
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: "easeOut" }}
         >
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
             <span className="bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
               Skills & Technologies
             </span>
           </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-secondary to-accent mx-auto mb-12" />
+          <div className="w-20 h-1 bg-gradient-to-r from-secondary to-accent mx-auto mb-6" />
+          
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="text-center text-muted-foreground mb-12 text-lg"
+          >
+            Here are the technologies I use to bring ideas to life — presented in an immersive 3D experience.
+          </motion.p>
 
-          <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20 shadow-[0_0_30px_rgba(0,217,255,0.1)]">
-            <div className="space-y-6">
-              {skillsWithProficiency.map((skill, index) => (
-                <AnimatedProgressBar 
-                  key={skill.name} 
-                  skill={skill} 
-                  index={index} 
-                  isInView={isInView} 
-                />
-              ))}
-            </div>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, delay: 0.5 }}
+            className="w-full h-[600px] rounded-xl overflow-hidden bg-gradient-to-br from-card/50 to-card/20 backdrop-blur-sm border border-primary/20 shadow-[0_0_50px_rgba(0,217,255,0.15)]"
+            style={{
+              boxShadow: "0 0 50px rgba(0, 217, 255, 0.15), 0 0 100px rgba(255, 0, 255, 0.1)",
+            }}
+          >
+            <Canvas
+              dpr={isMobile ? [1, 1.5] : [1, 2]}
+              performance={{ min: 0.5 }}
+              gl={{ 
+                antialias: !isMobile,
+                alpha: true,
+                powerPreference: "high-performance"
+              }}
+            >
+              <Scene onSkillClick={setSelectedSkill} />
+            </Canvas>
+          </motion.div>
 
-          {/* Additional Skills Tags */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="mt-8"
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 1 }}
+            className="mt-8 text-center text-sm text-muted-foreground"
           >
-            <h3 className="text-xl font-semibold text-center text-muted-foreground mb-4">
-              Additional Technologies
-            </h3>
-            <div className="flex flex-wrap gap-3 justify-center">
-              {["Git", "GitHub", "Firebase", "AWS", "HTML/CSS", "Machine Learning", "YOLO-v7", "RazorPay API"].map((tech, index) => (
-                <motion.div
-                  key={tech}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ duration: 0.3, delay: 1 + index * 0.05 }}
-                  whileHover={{ scale: 1.15, y: -3 }}
-                  className="px-4 py-2 bg-card/50 border border-accent/30 rounded-full text-sm text-foreground/90 hover:border-accent hover:shadow-[0_0_15px_rgba(0,217,255,0.4)] transition-all duration-300 cursor-default backdrop-blur-sm"
-                >
-                  {tech}
-                </motion.div>
-              ))}
-            </div>
+            <p>💡 Click on any skill to learn more • Drag to rotate • Hover for details</p>
           </motion.div>
         </motion.div>
       </div>
+
+      <Dialog open={!!selectedSkill} onOpenChange={() => setSelectedSkill(null)}>
+        <DialogContent className="bg-card/95 backdrop-blur-xl border-primary/30 shadow-[0_0_40px_rgba(0,217,255,0.2)]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
+              {selectedSkill?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Description</p>
+              <p className="text-foreground">{selectedSkill?.description}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Experience</p>
+              <p className="text-foreground font-semibold">{selectedSkill?.experience}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Proficiency</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-3 bg-muted/30 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${selectedSkill?.level}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="h-full bg-gradient-to-r from-secondary to-accent"
+                    style={{
+                      boxShadow: `0 0 20px ${selectedSkill?.color}`,
+                    }}
+                  />
+                </div>
+                <span className="text-lg font-bold text-accent">{selectedSkill?.level}%</span>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
