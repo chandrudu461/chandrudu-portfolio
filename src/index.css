@@ -59,6 +59,44 @@ All colors MUST be HSL.
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   }
 
+  .light {
+    --background: 200 20% 98%;
+    --foreground: 220 30% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 10%;
+
+    --primary: 190 95% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 320 85% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 20% 92%;
+    --muted-foreground: 220 20% 40%;
+
+    --accent: 280 80% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 85%;
+    --input: 220 20% 85%;
+    --ring: 190 95% 45%;
+
+    --neon-cyan: 190 95% 45%;
+    --neon-magenta: 320 85% 55%;
+    --neon-purple: 280 80% 60%;
+    
+    --shadow-glow-cyan: 0 0 20px hsl(190 95% 45% / 0.3);
+    --shadow-glow-magenta: 0 0 20px hsl(320 85% 55% / 0.3);
+    --shadow-glow-purple: 0 0 20px hsl(280 80% 60% / 0.2);
+  }
+
   .dark {
     --background: 220 30% 8%;
     --foreground: 200 100% 97%;
@@ -89,6 +127,7 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-sans;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   html {
